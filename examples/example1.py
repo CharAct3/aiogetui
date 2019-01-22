@@ -15,13 +15,10 @@ def main():
 
     async def run():
         await client.auth_sign()
-        message = ToSingleMessage(client_id=CLIENT_ID,
-                                  template=NotificationTemplate(
-                                      {
-                                          'title': 'my title',
-                                          'text': 'My text.',
-                                      }
-                                  ))
+        message = ToSingleMessage(
+            client_id=CLIENT_ID,
+            template=NotificationTemplate({'title': 'my title', 'text': 'My text.'}),
+        )
         _result = await client.push(message)
         await client.close()
         return _result

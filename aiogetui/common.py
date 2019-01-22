@@ -3,14 +3,15 @@ from template import Template
 
 
 class Message:
-
-    def __init__(self,
-                 client_id: str,
-                 template: Template,
-                 is_offline: bool = False,
-                 offline_expire_time: int = 0,
-                 message_id: str = None,
-                 push_info: dict = None):
+    def __init__(
+        self,
+        client_id: str,
+        template: Template,
+        is_offline: bool = False,
+        offline_expire_time: int = 0,
+        message_id: str = None,
+        push_info: dict = None,
+    ):
         """
         :param client_id: 客户端的 id
         :param template: 消息内容模板
@@ -63,23 +64,27 @@ class PushResult:
     INVALID_CLIENT_ID = 'no_user'
     HTTP_REQUEST_FAILED = 'http_request_failed'
 
-    def __init__(self,
-                 result: str,
-                 description: str=None,
-                 task_id: str=None,
-                 status: str=None):
+    def __init__(
+        self,
+        result: str,
+        description: str = None,
+        task_id: str = None,
+        status: str = None,
+    ):
         self.result = result
         self.description = description
         self.task_id = task_id
         self.status = status
 
     def __str__(self):
-        return f'PushResult<' \
-               f'result: {self.result}, ' \
-               f'description: {self.description}, ' \
-               f'task_id: {self.task_id}, ' \
-               f'status: {self.status}, ' \
-               f'>'
+        return (
+            f'PushResult<'
+            f'result: {self.result}, '
+            f'description: {self.description}, '
+            f'task_id: {self.task_id}, '
+            f'status: {self.status}, '
+            f'>'
+        )
 
     @property
     def is_successful(self):

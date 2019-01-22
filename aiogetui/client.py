@@ -1,6 +1,5 @@
 import hashlib
 import traceback
-from http import HTTPStatus
 
 import aiohttp
 import time
@@ -53,27 +52,29 @@ class IGeTui:
     async def push(self, message: Message) -> PushResult:
         """推送消息
         """
-        assert self.auth_token is not None, \
-            'No auth_token, cannot send request'
+        assert self.auth_token is not None, 'No auth_token, cannot send request'
 
         try:
-            json_result = await self._post(self.push_single_url,
-                                           json=message.to_params(self.app_key))
+            json_result = await self._post(
+                self.push_single_url, json=message.to_params(self.app_key)
+            )
         except aiohttp.ClientError:
-            return PushResult(PushResult.HTTP_REQUEST_FAILED,
-                              description=traceback.format_exc())
-        return PushResult(json_result.get('result'),
-                          json_result.get('desc'),
-                          json_result.get('taskid'),
-                          json_result.get('status'))
+            return PushResult(
+                PushResult.HTTP_REQUEST_FAILED, description=traceback.format_exc()
+            )
+        return PushResult(
+            json_result.get('result'),
+            json_result.get('desc'),
+            json_result.get('taskid'),
+            json_result.get('status'),
+        )
 
     async def _post(self, url, json=None):
         headers = dict()
         if self.auth_token:
             headers.update({'authtoken': self.auth_token})
-        async with self.session.post(
-                url, json=json, headers=headers) as response:
-            assert response.status == HTTPStatus.OK
+        async with self.session.post(url, json=json, headers=headers) as response:
+            response.raise_for_status()
             return await response.json(content_type='text/html')
 
     async def close(self):

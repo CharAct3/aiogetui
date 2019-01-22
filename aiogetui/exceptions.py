@@ -4,4 +4,5 @@ class AioGeTuiException(Exception):
 
 class AuthSignFailed(AioGeTuiException):
     """验证签名失败"""
+
     pass

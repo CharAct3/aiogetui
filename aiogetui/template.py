@@ -6,6 +6,7 @@ class Template:
     3. notypopload, 弹窗通知, 用户点击可直接下载文件/应用, 可用于检测版本更新
     4. transmission, 透传消, 是指消息传递到客户端只有消息内容, 展现的形式由客户端自行定义
     """
+
     type = None
 
     def to_dict(self):
@@ -15,12 +16,14 @@ class Template:
 class NotificationTemplate(Template):
     type = 'notification'
 
-    def __init__(self,
-                 style: dict,
-                 transmission_type: bool=None,
-                 transmission_content: str=None,
-                 duration_begin: str=None,
-                 duration_end: str=None):
+    def __init__(
+        self,
+        style: dict,
+        transmission_type: bool = None,
+        transmission_content: str = None,
+        duration_begin: str = None,
+        duration_end: str = None,
+    ):
         """
         除了 style, 都可以缺省
         :param style: {

@@ -16,10 +16,7 @@ AUTHOR = 'Darren Char'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1'
 
-REQUIRED = [
-    'six',
-    'aiohttp>3.0, <4.0',
-]
+REQUIRED = ['six', 'aiohttp>3.0, <4.0']
 
 EXTRAS = {
     # 'fancy feature': ['django'],
@@ -37,7 +34,7 @@ except FileNotFoundError:
 about = {}
 if not VERSION:
     with open(os.path.join(here, NAME, '__version__.py')) as f:
-        exec (f.read(), about)
+        exec(f.read(), about)
 else:
     about['__version__'] = VERSION
 
@@ -67,8 +64,7 @@ class UploadCommand(Command):
             pass
 
         self.status('Building Source and Wheel (universal) distribution…')
-        os.system('{0} setup.py sdist bdist_wheel --universal'.format(
-            sys.executable))
+        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
 
         self.status('Uploading the package to PyPI via Twine…')
         os.system('twine upload dist/*')
@@ -103,10 +99,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
+        'Programming Language :: Python :: Implementation :: PyPy',
     ],
     # $ setup.py publish support.
-    cmdclass={
-        'upload': UploadCommand,
-    },
+    cmdclass={'upload': UploadCommand},
 )
