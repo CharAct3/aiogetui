@@ -1,5 +1,5 @@
 import uuid
-from template import Template
+from aiogetui.template import Template
 
 
 class Message:

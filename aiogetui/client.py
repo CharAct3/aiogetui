@@ -6,8 +6,8 @@ import time
 
 import asyncio
 
-from common import Message, PushResult
-from exceptions import AuthSignFailed
+from aiogetui.common import Message, PushResult
+from aiogetui.exceptions import AuthSignFailed
 
 
 class IGeTui:
