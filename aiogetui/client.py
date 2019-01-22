@@ -4,6 +4,8 @@ import traceback
 import aiohttp
 import time
 
+import asyncio
+
 from common import Message, PushResult
 from exceptions import AuthSignFailed
 
@@ -12,7 +14,15 @@ class IGeTui:
     SIGN_URL = 'https://restapi.getui.com/v1/{app_id}/auth_sign'
     PUSH_SINGLE_URL = 'https://restapi.getui.com/v1/{app_id}/push_single'
 
-    def __init__(self, app_id, app_key, master_secret, loop=None):
+    def __init__(
+        self, app_id, app_key, master_secret, resign_interval=20 * 60, loop=None
+    ):
+        """
+        :param app_id:
+        :param app_key:
+        :param master_secret:
+        :param resign_interval: 单位分钟, 每过多少小时重新刷新 token, 由于限制是 24 小时自动过期, 所以默认 20 小时重新认证
+        """
         self.app_id = app_id
         self.app_key = app_key
         self.master_secret = master_secret
@@ -22,37 +32,43 @@ class IGeTui:
 
         # sign
         self.sign_url = self.SIGN_URL.format(app_id=self.app_id)
-        self.sign_timestamp = None
+        self.expire_timestamp = None
         self.auth_token = None
+        self.lock = None
+        self.resign_interval = resign_interval
+        assert self.resign_interval > 0
 
         # push
         self.push_single_url = self.PUSH_SINGLE_URL.format(app_id=self.app_id)
 
     async def auth_sign(self):
-        """用户身份验证通过获得auth_token权限令牌，后面的请求都需要带上auth_token
+        """用户身份验证通过获得 auth_token 权限令牌，后面的请求都需要带上 auth_token
         """
         if self.session is None:
             self.session = aiohttp.ClientSession(loop=self.loop)
 
-        self.sign_timestamp = int(time.time() * 1000)
-        raw_sign = self.app_key + str(self.sign_timestamp) + self.master_secret
+        timestamp = int(time.time() * 1000)
+        raw_sign = self.app_key + str(timestamp) + self.master_secret
         sign = hashlib.sha256(raw_sign.encode()).hexdigest()
 
-        sign_params = {
-            'appkey': self.app_key,
-            'timestamp': self.sign_timestamp,
-            'sign': sign,
-        }
+        sign_params = {'appkey': self.app_key, 'timestamp': timestamp, 'sign': sign}
         json_result = await self._post(self.sign_url, json=sign_params)
 
         if 'auth_token' not in json_result:
             raise AuthSignFailed(f'Reason: {json_result.get("result")}')
         self.auth_token = json_result['auth_token']
+        self.expire_timestamp = timestamp + self.resign_interval * 1000 * 60
 
     async def push(self, message: Message) -> PushResult:
         """推送消息
         """
-        assert self.auth_token is not None, 'No auth_token, cannot send request'
+        if self.lock is None:
+            self.lock = asyncio.Lock()
+        async with self.lock:
+            # 如果 token 过期, 重新认证一次签名
+            timestamp = int(time.time() * 1000)
+            if self.expire_timestamp is None or timestamp > self.expire_timestamp:
+                await self.auth_sign()
 
         try:
             json_result = await self._post(
