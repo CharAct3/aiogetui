@@ -17,6 +17,7 @@ REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1'
 
 REQUIRED = [
+    'six',
     'aiohttp>3.0, <4.0',
 ]
 
