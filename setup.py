@@ -14,7 +14,7 @@ URL = 'https://github.com/charact3/aiogetui'
 EMAIL = 'i@charact3.com'
 AUTHOR = 'Darren Char'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.2'
+VERSION = '0.3'
 
 REQUIRED = ['six', 'aiohttp>3.0, <4.0']
 
